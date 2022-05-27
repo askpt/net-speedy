@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Grpc.Net.Client;
 using Speedy.Host;
 
@@ -41,8 +43,9 @@ async Task DoGrpcHttpCall(string name)
     // Do a Http Call
     var httpClient = new HttpClient();
     var response = await httpClient.GetAsync($"http://localhost:5001/v1/greeter/{name}");
-    var content = await response.Content.ReadAsStringAsync();
-    Console.WriteLine(content);
+    var content = await response.Content.ReadAsStreamAsync();
+    var reply = await JsonSerializer.DeserializeAsync<HelloReply>(content);
+    Console.WriteLine("Greeting: " + reply!.Message);
 
     stopWatch.Stop();
     var time = stopWatch.ElapsedMilliseconds;
