@@ -10,6 +10,7 @@ const string Name = "Speedy";
 
 await DoGrpcCall(Name);
 await DoGrpcHttpCall(Name);
+await DoHttpCall(Name);
 
 Console.WriteLine("Shutting down");
 Console.WriteLine("Press any key to exit...");
@@ -17,12 +18,12 @@ Console.ReadKey();
 
 async Task DoGrpcCall(string name)
 {
-    var stopWatch = new Stopwatch();
-    stopWatch.Start();
-
     var httpHandler = new HttpClientHandler();
     // Return `true` to allow certificates that are untrusted/invalid
     httpHandler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+
+    var stopWatch = new Stopwatch();
+    stopWatch.Start();
 
     var channel = GrpcChannel.ForAddress("http://localhost:5000", new GrpcChannelOptions { HttpHandler = httpHandler });
     var client = new Greeter.GreeterClient(channel);
@@ -43,11 +44,28 @@ async Task DoGrpcHttpCall(string name)
     // Do a Http Call
     var httpClient = new HttpClient();
     var response = await httpClient.GetAsync($"http://localhost:5001/v1/greeter/{name}");
-    var content = await response.Content.ReadAsStreamAsync();
-    var reply = await JsonSerializer.DeserializeAsync<HelloReply>(content);
+    var content = await response.Content.ReadAsStringAsync();
+    var reply = JsonSerializer.Deserialize<HelloReply>(content);
     Console.WriteLine("Greeting: " + reply!.Message);
 
     stopWatch.Stop();
     var time = stopWatch.ElapsedMilliseconds;
     Console.WriteLine($"Operation DoGrpcHttpCall took {time}ms");
+}
+
+async Task DoHttpCall(string name)
+{
+    var stopWatch = new Stopwatch();
+    stopWatch.Start();
+
+    // Do a Http Call
+    var httpClient = new HttpClient();
+    var response = await httpClient.GetAsync($"http://localhost:5001/v2/greeter/{name}");
+    var content = await response.Content.ReadAsStringAsync();
+    var reply = JsonSerializer.Deserialize<HelloReply>(content);
+    Console.WriteLine("Greeting: " + reply!.Message);
+
+    stopWatch.Stop();
+    var time = stopWatch.ElapsedMilliseconds;
+    Console.WriteLine($"Operation DoHttpCall took {time}ms");
 }
