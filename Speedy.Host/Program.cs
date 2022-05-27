@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Speedy.Host;
 using Speedy.Host.Services;
@@ -19,14 +20,15 @@ builder.WebHost.ConfigureKestrel(options =>
 
 // Add services to the container.
 builder.Services.AddGrpc().AddJsonTranscoding();
+builder.Services.AddScoped<IRevertService, RevertService>();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.MapGrpcService<GreeterService>();
-app.MapGet("/v2/greeter/{name}", (string name) => new HelloReply
+app.MapGet("/v2/greeter/{name}", (string name, [FromServices] IRevertService revertService) => new HelloReply
 {
-    Message = "Hello " + name
+    Message = revertService.Revert(name)
 });
 app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 

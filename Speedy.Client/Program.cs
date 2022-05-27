@@ -7,15 +7,15 @@ AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport
 
 const string Name = "Speedy";
 
-await DoGrpcCall(Name);
-await DoGrpcHttpCall(Name);
+await DoGrpcJsonTranscodingCall(Name);
+await DoGrpcJsonTranscodingHttpCall(Name);
 await DoHttpCall(Name);
+await DoNativeGrpcCall(Name);
 
-Console.WriteLine("Shutting down");
 Console.WriteLine("Press any key to exit...");
 Console.ReadKey();
 
-async Task DoGrpcCall(string name)
+async Task DoGrpcJsonTranscodingCall(string name)
 {
     var httpHandler = new HttpClientHandler();
     // Return `true` to allow certificates that are untrusted/invalid
@@ -28,14 +28,32 @@ async Task DoGrpcCall(string name)
     var client = new Greeter.GreeterClient(channel);
 
     var reply = await client.SayHelloAsync(new HelloRequest { Name = name });
-    Console.WriteLine("Greeting: " + reply.Message);
 
     stopWatch.Stop();
     var time = stopWatch.ElapsedMilliseconds;
-    Console.WriteLine($"Operation DoGrpcCall took {time}ms");
+    Console.WriteLine($"Operation {nameof(DoGrpcJsonTranscodingCall)} took {time}ms. Response: {reply.Message}");
 }
 
-async Task DoGrpcHttpCall(string name)
+async Task DoNativeGrpcCall(string name)
+{
+    var httpHandler = new HttpClientHandler();
+    // Return `true` to allow certificates that are untrusted/invalid
+    httpHandler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+
+    var stopWatch = new Stopwatch();
+    stopWatch.Start();
+
+    var channel = GrpcChannel.ForAddress("http://localhost:5000", new GrpcChannelOptions { HttpHandler = httpHandler });
+    var client = new Greeter.GreeterClient(channel);
+
+    var reply = await client.SayHelloAgainAsync(new HelloRequest { Name = name });
+
+    stopWatch.Stop();
+    var time = stopWatch.ElapsedMilliseconds;
+    Console.WriteLine($"Operation {nameof(DoNativeGrpcCall)} took {time}ms. Response: {reply.Message}");
+}
+
+async Task DoGrpcJsonTranscodingHttpCall(string name)
 {
     var stopWatch = new Stopwatch();
     stopWatch.Start();
@@ -45,11 +63,10 @@ async Task DoGrpcHttpCall(string name)
     var response = await httpClient.GetAsync($"http://localhost:5001/v1/greeter/{name}");
     var content = await response.Content.ReadAsStringAsync();
     var reply = JsonSerializer.Deserialize<HelloReply>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-    Console.WriteLine("Greeting: " + reply!.Message);
 
     stopWatch.Stop();
     var time = stopWatch.ElapsedMilliseconds;
-    Console.WriteLine($"Operation DoGrpcHttpCall took {time}ms");
+    Console.WriteLine($"Operation {nameof(DoGrpcJsonTranscodingHttpCall)} took {time}ms. Response: {reply!.Message}");
 }
 
 async Task DoHttpCall(string name)
@@ -62,9 +79,8 @@ async Task DoHttpCall(string name)
     var response = await httpClient.GetAsync($"http://localhost:5001/v2/greeter/{name}");
     var content = await response.Content.ReadAsStringAsync();
     var reply = JsonSerializer.Deserialize<HelloReply>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-    Console.WriteLine("Greeting: " + reply!.Message);
 
     stopWatch.Stop();
     var time = stopWatch.ElapsedMilliseconds;
-    Console.WriteLine($"Operation DoHttpCall took {time}ms");
+    Console.WriteLine($"Operation {nameof(DoHttpCall)} took {time}ms. Response: {reply!.Message}");
 }

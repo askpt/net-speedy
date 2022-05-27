@@ -13,6 +13,8 @@ service Greeter {
       get: "/v1/greeter/{name}"
     };
   }
+
+  rpc SayHelloAgain (HelloRequest) returns (HelloReply);
 }
 
 // The request message containing the user's name.

@@ -4,17 +4,26 @@ namespace Speedy.Host.Services;
 
 public class GreeterService : Greeter.GreeterBase
 {
-    private readonly ILogger<GreeterService> _logger;
-    public GreeterService(ILogger<GreeterService> logger)
+    private readonly IRevertService _revertService;
+
+    public GreeterService(IRevertService revertService)
     {
-        _logger = logger;
+        _revertService = revertService;
     }
 
     public override Task<HelloReply> SayHello(HelloRequest request, ServerCallContext context)
     {
         return Task.FromResult(new HelloReply
         {
-            Message = "Hello " + request.Name
+            Message = _revertService.Revert(request.Name)
+        });
+    }
+
+    public override Task<HelloReply> SayHelloAgain(HelloRequest request, ServerCallContext context)
+    {
+        return Task.FromResult(new HelloReply
+        {
+            Message = _revertService.Revert(request.Name)
         });
     }
 }
