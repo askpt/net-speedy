@@ -1,6 +1,13 @@
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Speedy.Host.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Hack for HTTP/2 TLS for macOS
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenLocalhost(5000, o => o.Protocols = HttpProtocols.Http2);
+});
 
 // Additional configuration is required to successfully run gRPC on macOS.
 // For instructions on how to configure Kestrel and gRPC clients on macOS, visit https://go.microsoft.com/fwlink/?linkid=2099682
