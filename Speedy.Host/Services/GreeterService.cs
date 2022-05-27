@@ -1,5 +1,4 @@
 using Grpc.Core;
-using Speedy.Host;
 
 namespace Speedy.Host.Services;
 

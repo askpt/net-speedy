@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Hack for HTTP/2 TLS for macOS
 builder.WebHost.ConfigureKestrel(options =>
 {
+    // Setup a HTTP/2 endpoint without TLS.
     options.ListenLocalhost(5000, o => o.Protocols = HttpProtocols.Http2);
 });
 
