@@ -4,6 +4,7 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <WasiRunnerArgs>--tcplisten localhost:5000 --tcplisten localhost:5001</WasiRunnerArgs>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,8 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Grpc.AspNetCore" Version="2.43.0" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.46.0" />
     <PackageReference Include="Microsoft.AspNetCore.Grpc.JsonTranscoding" Version="7.0.0-preview.4.22251.1" />
+    <PackageReference Include="Wasi.AspNetCore.Server.Native" Version="0.1.1" />
+    <PackageReference Include="Wasi.Sdk" Version="0.1.1" />
   </ItemGroup>
 
 </Project>
