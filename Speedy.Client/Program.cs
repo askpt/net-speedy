@@ -60,6 +60,8 @@ async Task DoGrpcJsonTranscodingHttpCall(string name)
 
     // Do a Http Call
     var httpClient = new HttpClient();
+    httpClient.DefaultRequestVersion = Version.Parse("2.0");
+    httpClient.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact;
     var response = await httpClient.GetAsync($"http://localhost:5001/v1/greeter/{name}");
     var content = await response.Content.ReadAsStringAsync();
     var reply = JsonSerializer.Deserialize<HelloReply>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
@@ -76,6 +78,8 @@ async Task DoHttpCall(string name)
 
     // Do a Http Call
     var httpClient = new HttpClient();
+    httpClient.DefaultRequestVersion = Version.Parse("2.0");
+    httpClient.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact;
     var response = await httpClient.GetAsync($"http://localhost:5001/v2/greeter/{name}");
     var content = await response.Content.ReadAsStringAsync();
     var reply = JsonSerializer.Deserialize<HelloReply>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
