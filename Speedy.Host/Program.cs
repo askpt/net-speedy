@@ -5,7 +5,8 @@ using Speedy.Host.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.UseWasiConnectionListener();
+// This is for the WASI runtime.
+// builder.UseWasiConnectionListener();
 
 // Hack for HTTP/2 TLS for macOS
 builder.WebHost.ConfigureKestrel(options =>
