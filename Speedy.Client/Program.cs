@@ -17,9 +17,11 @@ Console.ReadKey();
 
 async Task DoGrpcJsonTranscodingCall(string name)
 {
-    var httpHandler = new HttpClientHandler();
-    // Return `true` to allow certificates that are untrusted/invalid
-    httpHandler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+    var httpHandler = new HttpClientHandler
+    {
+        // Return `true` to allow certificates that are untrusted/invalid
+        ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+    };
 
     var stopWatch = new Stopwatch();
     stopWatch.Start();
@@ -36,9 +38,11 @@ async Task DoGrpcJsonTranscodingCall(string name)
 
 async Task DoNativeGrpcCall(string name)
 {
-    var httpHandler = new HttpClientHandler();
-    // Return `true` to allow certificates that are untrusted/invalid
-    httpHandler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+    var httpHandler = new HttpClientHandler
+    {
+        // Return `true` to allow certificates that are untrusted/invalid
+        ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+    };
 
     var stopWatch = new Stopwatch();
     stopWatch.Start();
@@ -59,9 +63,11 @@ async Task DoGrpcJsonTranscodingHttpCall(string name)
     stopWatch.Start();
 
     // Do a Http Call
-    var httpClient = new HttpClient();
-    httpClient.DefaultRequestVersion = Version.Parse("2.0");
-    httpClient.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact;
+    var httpClient = new HttpClient
+    {
+        DefaultRequestVersion = Version.Parse("2.0"),
+        DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact
+    };
     var response = await httpClient.GetAsync($"http://localhost:5001/v1/greeter/{name}");
     var content = await response.Content.ReadAsStringAsync();
     var reply = JsonSerializer.Deserialize<HelloReply>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
@@ -77,9 +83,11 @@ async Task DoHttpCall(string name)
     stopWatch.Start();
 
     // Do a Http Call
-    var httpClient = new HttpClient();
-    httpClient.DefaultRequestVersion = Version.Parse("2.0");
-    httpClient.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact;
+    var httpClient = new HttpClient
+    {
+        DefaultRequestVersion = Version.Parse("2.0"),
+        DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact
+    };
     var response = await httpClient.GetAsync($"http://localhost:5001/v2/greeter/{name}");
     var content = await response.Content.ReadAsStringAsync();
     var reply = JsonSerializer.Deserialize<HelloReply>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
